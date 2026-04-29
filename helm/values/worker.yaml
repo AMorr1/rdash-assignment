@@ -1,0 +1,43 @@
+fullnameOverride: rdash-worker
+image:
+  repository: ghcr.io/example/rdash-worker
+  tag: v0.1.0
+replicaCount: 2
+ingress:
+  enabled: false
+serviceAccount:
+  annotations:
+    azure.workload.identity/client-id: "replace-with-uami-client-id"
+env:
+  SERVICE_NAME: rdash-worker
+  REGISTRY_BASE_URL: http://rdash-registry.rdash.svc.cluster.local:8080
+  SERVICEBUS_NAMESPACE: rdash-dev-sb
+  SERVICEBUS_TOPIC: rdash-events
+  SERVICEBUS_SUBSCRIPTION: worker
+  OBJECT_STORAGE_CONTAINER: worker-results
+envSecrets:
+  - name: REDIS_URL
+    secretName: worker-app-secrets
+    secretKey: REDIS_URL
+  - name: OBJECT_STORAGE_ACCOUNT_URL
+    secretName: worker-app-secrets
+    secretKey: OBJECT_STORAGE_ACCOUNT_URL
+  - name: SERVICE_TOKEN_SECRET
+    secretName: worker-app-secrets
+    secretKey: SERVICE_TOKEN_SECRET
+externalSecret:
+  enabled: true
+  targetName: worker-app-secrets
+  data:
+    - secretKey: REDIS_URL
+      remoteKey: rdash/shared/redis-url
+    - secretKey: OBJECT_STORAGE_ACCOUNT_URL
+      remoteKey: rdash/shared/object-storage-account-url
+    - secretKey: SERVICE_TOKEN_SECRET
+      remoteKey: rdash/shared/service-token-secret
+networkPolicy:
+  ingressNamespaces:
+    - rdash
+  allowedEgressCidrs:
+    - 10.20.40.0/24
+    - 10.20.41.0/24

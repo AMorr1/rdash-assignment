@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rdash-platform-dashboard
+  labels:
+    grafana_dashboard: "1"
+data:
+  rdash-platform.json: |
+    {
+      "title": "RDash Platform Overview",
+      "panels": [
+        {
+          "type": "timeseries",
+          "title": "HTTP Request Rate",
+          "targets": [
+            {
+              "expr": "sum(rate(rdash_http_requests_total[5m])) by (service)"
+            }
+          ]
+        },
+        {
+          "type": "timeseries",
+          "title": "P95 Latency",
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.95, sum(rate(rdash_http_request_duration_seconds_bucket[5m])) by (le, service))"
+            }
+          ]
+        },
+        {
+          "type": "stat",
+          "title": "CrashLoop Pods",
+          "targets": [
+            {
+              "expr": "sum(kube_pod_container_status_waiting_reason{reason=\"CrashLoopBackOff\"})"
+            }
+          ]
+        }
+      ],
+      "schemaVersion": 39,
+      "version": 1
+    }
+

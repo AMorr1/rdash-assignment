@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: rdash
+  namespace: argocd
+spec:
+  description: RDash platform applications
+  sourceRepos:
+    - '*'
+  destinations:
+    - namespace: platform
+      server: https://kubernetes.default.svc
+    - namespace: rdash
+      server: https://kubernetes.default.svc
+    - namespace: default
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+

@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: rdash-services
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - name: core
+            valuesFile: helm/values/core.yaml
+          - name: registry
+            valuesFile: helm/values/registry.yaml
+          - name: worker
+            valuesFile: helm/values/worker.yaml
+  template:
+    metadata:
+      name: '{{name}}'
+    spec:
+      project: rdash
+      source:
+        repoURL: https://github.com/example/rdash-devops-assignment.git
+        targetRevision: main
+        path: helm/charts/rdash-service
+        helm:
+          valueFiles:
+            - '../../{{valuesFile}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: rdash
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+

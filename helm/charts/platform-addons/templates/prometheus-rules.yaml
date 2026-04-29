@@ -1,0 +1,30 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: rdash-platform-alerts
+spec:
+  groups:
+    - name: rdash.platform
+      rules:
+        - alert: IngressHigh429Rate
+          expr: sum(rate(nginx_ingress_controller_requests{status="429"}[5m])) > 2
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: NGINX is rate limiting user traffic aggressively.
+        - alert: PodCrashLooping
+          expr: max_over_time(kube_pod_container_status_waiting_reason{reason="CrashLoopBackOff"}[10m]) > 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: One or more pods are crash looping.
+        - alert: RedisCacheDown
+          expr: absent(up{job="redis-exporter"} == 1)
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: Redis exporter is unavailable.
+

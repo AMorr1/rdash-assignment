@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: rbac-validation
+  namespace: default
+spec:
+  restartPolicy: Never
+  serviceAccountName: rbac-test-sa
+  containers:
+    - name: validation
+      image: {{ .Values.validationImage }}
+      command: ["/bin/sh", "-c", "sleep 3600"]
+      env:
+        - name: BLOB_URL
+          value: {{ .Values.bucketUrl | quote }}
+

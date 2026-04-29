@@ -1,0 +1,7 @@
+apiVersion: v2
+name: rdash-service
+description: Reusable chart for RDash microservices.
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+

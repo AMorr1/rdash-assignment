@@ -1,0 +1,14 @@
+subscription_id         = "00000000-0000-0000-0000-000000000000"
+tenant_id               = "00000000-0000-0000-0000-000000000000"
+location                = "eastus2"
+environment             = "dev"
+name_prefix             = "rdash"
+kubernetes_version      = "1.31"
+authorized_ip_ranges    = ["203.0.113.10/32"]
+postgres_admin_password = "replace-me"
+grafana_admin_password  = "replace-me"
+slack_webhook_url       = "https://hooks.slack.com/services/replace/me"
+domain_name             = "rdash.example.com"
+dns_zone_name           = "example.com"
+letsencrypt_email       = "platform@example.com"
+enable_frontdoor        = true

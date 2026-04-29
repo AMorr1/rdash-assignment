@@ -1,0 +1,44 @@
+fullnameOverride: rdash-core
+image:
+  repository: ghcr.io/example/rdash-core
+  tag: v0.1.0
+replicaCount: 3
+ingress:
+  hostname: core.rdash.example.com
+  tlsSecretName: core-rdash-tls
+env:
+  SERVICE_NAME: rdash-core
+  REGISTRY_BASE_URL: http://rdash-registry.rdash.svc.cluster.local:8080
+  SERVICEBUS_NAMESPACE: rdash-dev-sb
+  SERVICEBUS_TOPIC: rdash-events
+envSecrets:
+  - name: POSTGRES_PRIMARY_DSN
+    secretName: core-app-secrets
+    secretKey: POSTGRES_PRIMARY_DSN
+  - name: POSTGRES_REPLICA_DSN
+    secretName: core-app-secrets
+    secretKey: POSTGRES_REPLICA_DSN
+  - name: REDIS_URL
+    secretName: core-app-secrets
+    secretKey: REDIS_URL
+  - name: SERVICE_TOKEN_SECRET
+    secretName: core-app-secrets
+    secretKey: SERVICE_TOKEN_SECRET
+externalSecret:
+  enabled: true
+  targetName: core-app-secrets
+  data:
+    - secretKey: POSTGRES_PRIMARY_DSN
+      remoteKey: rdash/core/postgres-primary-dsn
+    - secretKey: POSTGRES_REPLICA_DSN
+      remoteKey: rdash/core/postgres-replica-dsn
+    - secretKey: REDIS_URL
+      remoteKey: rdash/shared/redis-url
+    - secretKey: SERVICE_TOKEN_SECRET
+      remoteKey: rdash/shared/service-token-secret
+networkPolicy:
+  ingressNamespaces:
+    - platform
+  allowedEgressCidrs:
+    - 10.20.40.0/24
+    - 10.20.41.0/24

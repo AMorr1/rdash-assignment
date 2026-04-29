@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: platform-addons
+  namespace: argocd
+spec:
+  project: rdash
+  source:
+    repoURL: https://github.com/example/rdash-devops-assignment.git
+    targetRevision: main
+    path: helm/charts/platform-addons
+    helm:
+      valueFiles:
+        - ../../helm/charts/platform-addons/values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: platform
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+

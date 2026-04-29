@@ -1,0 +1,59 @@
+name: ci
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.5
+
+      - uses: azure/setup-helm@v4
+        with:
+          version: v3.15.4
+
+      - name: Install Python deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Python syntax
+        run: python -m py_compile $(find services -name '*.py' | tr '\n' ' ')
+
+      - name: Unit tests
+        run: python -m unittest discover -s tests
+
+      - name: Terraform fmt
+        run: terraform fmt -check -recursive terraform
+
+      - name: Helm lint
+        run: |
+          helm dependency build helm/charts/platform-addons
+          helm lint helm/charts/platform-addons
+          helm lint helm/charts/rdash-service
+          helm lint helm/charts/rbac-validation
+
+  docker-build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - core
+          - registry
+          - worker
+          - validation
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -f services/${{ matrix.service }}/Dockerfile -t rdash-${{ matrix.service }}:ci .

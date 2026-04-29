@@ -1,0 +1,4 @@
+bucketUrl: https://replace.blob.core.windows.net/worker-results
+serviceAccountClientId: replace-with-client-id
+validationImage: ghcr.io/example/rdash-rbac-validation:v0.1.0
+

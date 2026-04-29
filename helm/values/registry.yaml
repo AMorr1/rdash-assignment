@@ -1,0 +1,38 @@
+fullnameOverride: rdash-registry
+image:
+  repository: ghcr.io/example/rdash-registry
+  tag: v0.1.0
+replicaCount: 2
+ingress:
+  hostname: registry.rdash.example.com
+  tlsSecretName: registry-rdash-tls
+  annotations:
+    nginx.ingress.kubernetes.io/auth-url: http://oauth2-proxy.platform.svc.cluster.local/oauth2/auth
+    nginx.ingress.kubernetes.io/auth-signin: https://auth.rdash.example.com/oauth2/start?rd=$escaped_request_uri
+env:
+  SERVICE_NAME: rdash-registry
+envSecrets:
+  - name: POSTGRES_PRIMARY_DSN
+    secretName: registry-app-secrets
+    secretKey: POSTGRES_PRIMARY_DSN
+  - name: POSTGRES_REPLICA_DSN
+    secretName: registry-app-secrets
+    secretKey: POSTGRES_REPLICA_DSN
+  - name: SERVICE_TOKEN_SECRET
+    secretName: registry-app-secrets
+    secretKey: SERVICE_TOKEN_SECRET
+externalSecret:
+  enabled: true
+  targetName: registry-app-secrets
+  data:
+    - secretKey: POSTGRES_PRIMARY_DSN
+      remoteKey: rdash/registry/postgres-primary-dsn
+    - secretKey: POSTGRES_REPLICA_DSN
+      remoteKey: rdash/registry/postgres-replica-dsn
+    - secretKey: SERVICE_TOKEN_SECRET
+      remoteKey: rdash/shared/service-token-secret
+networkPolicy:
+  ingressNamespaces:
+    - platform
+  allowedEgressCidrs:
+    - 10.20.40.0/24

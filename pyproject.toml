@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rdash-devops-assignment"
+version = "0.1.0"
+description = "Production-grade submission for the RDash senior DevOps technical assignment."
+readme = "README.md"
+requires-python = ">=3.12"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.pytest.ini_options]
+pythonpath = ["services", "."]
+
