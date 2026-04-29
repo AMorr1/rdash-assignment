@@ -2,13 +2,6 @@ name: deploy-core
 
 on:
   workflow_dispatch:
-  push:
-    branches: ["main"]
-    paths:
-      - "services/core/**"
-      - "services/common/**"
-      - "helm/charts/rdash-service/**"
-      - "helm/values/core.yaml"
 
 env:
   IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/rdash-core
@@ -35,7 +28,7 @@ jobs:
         run: docker build -f services/core/Dockerfile -t $IMAGE_NAME:${{ github.sha }} .
 
       - name: Scan image
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.35.0
         with:
           image-ref: ${{ env.IMAGE_NAME }}:${{ github.sha }}
           format: table
@@ -65,4 +58,3 @@ jobs:
             -f helm/values/core.yaml \
             --set image.repository=$IMAGE_NAME \
             --set image.tag=${{ github.sha }}
-
